@@ -1,0 +1,28 @@
+{
+    "en": {
+        "title": "Portfolio Consolidation",
+        "importFile": "Import File",
+        "customer": "Customer",
+        "startValue": "Start Value",
+        "endValue": "End Value",
+        "totalValue": "Total Value",
+        "totalOperations": "Total Profit",
+        "netTotal": "Total Profit Percentage",
+        "averageCapital": "Average Capital",
+        "approximateProfit": "Approximate Profit",
+        "cdi" : "CDI"
+    },
+    "pt": {
+        "title": "Consolidação de Carteira",
+        "importFile": "Importar Arquivo",
+        "customer": "Cliente",
+        "startValue": "Valor Inicial",
+        "endValue": "Valor Final",
+        "totalValue": "Valor Total",
+        "totalOperations": "Total de Operações",
+        "netTotal": "Total de Lucro",
+        "averageCapital": "Capital Médio",
+        "approximateProfit": "Lucro Aproximado",
+        "cdi" : "CDI"
+    }
+}
