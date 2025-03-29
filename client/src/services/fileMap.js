@@ -1,4 +1,4 @@
-
+'use client'
 /**
  * Maps data from an Excel file into a structured format
  * 

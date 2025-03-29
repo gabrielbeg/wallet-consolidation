@@ -4,6 +4,7 @@ import Image from "next/image";
 import * as XLSX from "xlsx";
 import languages from "@/services/languages.json";
 import MapExcelData from "@/services/fileMap";
+import MonthlyReport from "@/components/report";
 
 export default function Home() {
   const [tableData, setTableData] = useState([]);
@@ -76,6 +77,9 @@ export default function Home() {
           </label>
         </div>
         {/* Table - only display if tableData has elements */}
+        {tableData.length === 0 && (
+          <MonthlyReport data={tableData} />
+        )}
         {tableData.length > 0 && (
           <div className="overflow-x-auto">
             <table className="w-full bg-white dark:bg-gray-800 rounded-lg shadow-md">
