@@ -21,8 +21,8 @@ const MapExcelData = (data) => {
         // Transform it into a list of cells
         const cells = Object.keys(currentSheet).filter(cell => cell !== "!ref" && cell !== "!merges" && cell !== "!margins");      
         // Date Selection
-        const dateStart = new Date(FormatDate(currentSheet["A3"].w));
-        const dateEnd = new Date(FormatDate(currentSheet["A4"].w));
+        const dateStart = currentSheet["A3"].w;
+        const dateEnd = currentSheet["A4"].w;
         let funds = [];
         // Fund Names
         let fundNames = cells.filter(cell => cell.includes("B") && Number(cell[1]) > 2).map(cell => currentSheet[cell]);
@@ -33,7 +33,7 @@ const MapExcelData = (data) => {
         let fundOperations = cells.filter(cell => cell.includes("H") && Number(cell[1]) > 2).map(cell => { 
             return ({
                 fund: currentSheet[cell].v,
-                date:currentSheet[`E${cell[1]}`].v,
+                date: currentSheet[`E${cell[1]}`].w,
                 type: currentSheet[`F${cell[1]}`].v,
                 value: currentSheet[`G${cell[1]}`].v
             })
@@ -46,20 +46,22 @@ const MapExcelData = (data) => {
             return {
                 name: name.v,
                 startValue: fundStartValues[index].v,
-                operations: fundOperations.filter(operation => operation.fund === name.v),
-                endValue: fundEndValues[index]
+                endValue: fundEndValues[index]?.v ?? 'Não Apurado'
             }
         });
         // Values ​​for the mappedItem object
         mappedItem.startValue = currentSheet["M1"].v;
         mappedItem.endValue = currentSheet["M2"].v;
         mappedItem.totalOperations = currentSheet["M3"].v;
+        mappedItem.operations = fundOperations;
         mappedItem.netTotal = currentSheet["M4"].v;
         mappedItem.averageCapital = currentSheet["M5"].v;
         mappedItem.approximateProfit = currentSheet["M6"].v;
         mappedItem.cdi = currentSheet["M7"]?.v ?? 0;
         mappedItem.funds = funds;
         mappedItem.serviceFee = currentSheet["N2"].v;
+        mappedItem.dateStart = dateStart;
+        mappedItem.dateEnd = dateEnd;
         mappedData.push(mappedItem);
     }
     return mappedData;

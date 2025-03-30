@@ -5,12 +5,17 @@ import * as XLSX from "xlsx";
 import languages from "@/services/languages.json";
 import MapExcelData from "@/services/fileMap";
 import MonthlyReport from "@/components/report";
+import { ConvertToCurrency } from "@/services/utils";
 
 export default function Home() {
   const [tableData, setTableData] = useState([]);
   const [lang, _setLang] = useState("pt");
   const [texts, setTexts] = useState(languages[lang]);
 
+  /**
+   * When a file is selected, read the file and map the data
+   * @param {event} e 
+   */
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     const reader = new FileReader();
@@ -18,18 +23,21 @@ export default function Home() {
       const data = new Uint8Array(event.target.result);
       const workbook = XLSX.read(data, { type: "array" });
       const mappedData = MapExcelData(workbook);
-      console.log(mappedData);
       setTableData(mappedData);
     };
     reader.readAsArrayBuffer(file);
   };
 
+  /**
+   * Select a language to set the texts
+   * @param {string} lang - Language to set
+   */
   const setLang = (lang) => {
     setTexts(languages[lang]);
     _setLang(lang);
   }
 
-  return (    
+  return (  
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 p-4 md:p-8">
       <main className="container mx-auto max-w-7xl">    
             {/* Language Switcher */}
@@ -76,42 +84,42 @@ export default function Home() {
             />
           </label>
         </div>
-        {/* Table - only display if tableData has elements */}
-        {tableData.length === 0 && (
-          <MonthlyReport data={tableData} />
-        )}
+        {/* Table */}
         {tableData.length > 0 && (
-          <div className="overflow-x-auto">
-            <table className="w-full bg-white dark:bg-gray-800 rounded-lg shadow-md">
-              <thead>
-                <tr>
-                  <th className="py-2 px-4 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-semibold uppercase text-sm text-center">{texts.customer}</th>
-                  <th className="py-2 px-4 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-semibold uppercase text-sm text-center">{texts.startValue}</th>
-                  <th className="py-2 px-4 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-semibold uppercase text-sm text-center">{texts.endValue}</th>
-                  <th className="py-2 px-4 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-semibold uppercase text-sm text-center">{texts.totalOperations}</th>
-                  <th className="py-2 px-4 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-semibold uppercase text-sm text-center">{texts.netTotal}</th>
-                  <th className="py-2 px-4 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-semibold uppercase text-sm text-center">{texts.averageCapital}</th>
-                  <th className="py-2 px-4 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-semibold uppercase text-sm text-center">{texts.approximateProfit}</th>
-                  <th className="py-2 px-4 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-semibold uppercase text-sm text-center">{texts.cdi}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {tableData.map((item, index) => (
-                  <tr key={index} className="border-b dark:border-gray-700">
-                    <td className="py-2 px-4 text-gray-800 dark:text-gray-200 text-center">{item.customer}</td>
-                    <td className="py-2 px-4 text-gray-800 dark:text-gray-200 text-center">{item.startValue}</td>
-                    <td className="py-2 px-4 text-gray-800 dark:text-gray-200 text-center">{item.endValue}</td>
-                    <td className="py-2 px-4 text-gray-800 dark:text-gray-200 text-center">{item.totalOperations}</td>
-                    <td className="py-2 px-4 text-gray-800 dark:text-gray-200 text-center">{item.netTotal}</td>
-                    <td className="py-2 px-4 text-gray-800 dark:text-gray-200 text-center">{item.averageCapital}</td>
-                    <td className="py-2 px-4 text-gray-800 dark:text-gray-200 text-center">{item.approximateProfit}</td>
-                    <td className="py-2 px-4 text-gray-800 dark:text-gray-200 text-center">{item.cdi}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+        <div className="overflow-x-auto shadow-md sm:rounded-lg mb-8">
+        <table className="w-full text-sm text-center text-gray-500 dark:text-gray-400">
+        <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+        <tr>
+          <th key='customer' className="px-6 py-3">Customer</th>
+          <th key='dateStart' className="px-6 py-3">Date Start</th>
+          <th key='dateEnd' className="px-6 py-3">Date End</th>
+          <th key='profit' className="px-6 py-3">Approximate Profit</th>
+          <th key='fee' className="px-6 py-3">Service Fee</th>
+        </tr>
+        </thead>
+        <tbody>
+        {tableData.map((item, index) => (
+        <tr key={index} className="bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-600" style={{ height: "50px" }}>
+          <td className="ml-2">{item.customer}</td>
+          <td className="text-center">{item.dateStart}</td>
+          <td className="text-center">{item.dateEnd}</td>
+          <td className="text-center">{(item.approximateProfit * 100).toFixed(2)}%</td>
+          <td className="text-center">{ConvertToCurrency(item.serviceFee)}</td>
+        </tr>
+        ))}
+        </tbody>
+        </table>
+        </div>
+        )}
+        {/* PDFViewer */}
+        {tableData.length > 0 && (
+          <div className="flex flex-col items-center justify-center mb-8 w-full">
+            {tableData.map((item, index) => (
+              <MonthlyReport key={`pdf-${index}`} data={item}/>
+            ))}
           </div>
         )}
+        {/* Footer */}
       </main>          
     </div>
   );
