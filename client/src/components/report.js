@@ -2,19 +2,12 @@
 import dynamic from "next/dynamic";
 
 // Use dynamic importing, otherwise we will have a server-side error(Using 'use client' is not enough) which is not compatible.
-const PDFViewer = dynamic(
-  () => import("@react-pdf/renderer").then((mod) => mod.PDFViewer),
-  {
-    ssr: false,
-    loading: () => <p>Loading...</p>,
-  });
 const PDFDownloadLink = dynamic(
   () => import("@react-pdf/renderer").then((mod) => mod.PDFDownloadLink),
   {
-    ssr: false,
-    loading: () => <p>Loading...</p>,
+    ssr: false
   });
-import React from "react";
+import React, { useEffect } from "react";
 import { Document, Page, View, Image, Text, StyleSheet } from '@react-pdf/renderer';
 import { ConvertToCurrency } from "@/services/utils";
 import RetrieveQrCode from "@/api/qrCodeGenerator";
@@ -108,6 +101,15 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     justifyContent: 'center',
   },
+  paymentBox:{
+    width: '60%',
+    borderRadius: 4,
+    backgroundColor: '#E5E5E5',
+    padding: 5,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   resumoTitle: {
     fontSize: 12,
     marginBottom: 2,
@@ -115,31 +117,99 @@ const styles = StyleSheet.create({
   resumoValue: {
     fontSize: 14,
     fontWeight: 'bold'
+  },
+  textWrap: {
+    display: "flex",
+    flexWrap: "wrap",
+    flexGrow: 1,
+    flexBasis: 0,
+    padding: 2,
+    leftMargin: 5,
+  },
+  operationsText: {
+    width: '30%'
   }
 });
   
+/**
+ * Deals with the monthly report generation and download
+ * It awaits for the QRCode to be generated and then displays the download button accordingly
+ * @param {*} data 
+ * @returns 
+ */
 function MonthlyReport(data){
-  return(
-  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%'}}>
-    <PDFViewer style={{ width: '80%', height: '80vh' }} showToolbar={true}>
-      <MyDocument data={data}/>
-    </PDFViewer>
-    <PDFDownloadLink document={<MyDocument data={data}/>} fileName={`${data.data.customer}.pdf`}>
-    <button style={{ marginTop: 20, padding: 10, backgroundColor: '#007BFF', color: '#FFF', border: 'none', borderRadius: 5 }}>Baixar PDF</button>
-    </PDFDownloadLink>
-  </div>
+  const[qrCode, setQrCode] = React.useState(null);
+  const [error, setError] = React.useState(null);
+  const [loading, setLoading] = React.useState(true);
+
+  useEffect(() => {
+    setLoading(true);
+    RetrieveQrCode(data.data.serviceFee).then((response) =>
+    {
+      if(response.statusCode === 200) {
+        response = JSON.parse(response.body);
+        setQrCode(response.qrCode);
+        setLoading(false);
+      }
+      else
+      {
+        setError(new Error('QR Code não gerado'));
+        setLoading(false);
+      }
+    }).catch((error) => {
+      console.error(error);
+      setError(error);
+      setLoading(false);
+    })
+  }, [qrCode]);
+
+  if(error) {
+    return <p style={styles.error}>Erro ao gerar QR Code: {error.message}</p>;
+  }
+  if(loading) {
+    return(
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
+      <div style={{ 
+      width: '40px', 
+      height: '40px', 
+      border: '4px solid rgba(0, 0, 0, 0.1)', 
+      borderTopColor: '#007BFF', 
+      borderRadius: '50%', 
+      animation: 'spin 1s linear infinite' 
+      }}></div>
+      <style jsx>{`
+      @keyframes spin {
+        to {transform: rotate(360deg);}
+      }
+      `}</style>
+    </div>);
+  }
+
+  const newData = {
+    data: {
+      ...data.data,
+      qrCode: qrCode
+    }
+  }
+
+  return (
+    <div className="flex flex-col items-center justify-center w-full my-5">
+      <PDFDownloadLink document={<MyDocument data={newData}/>} fileName={`${data.data.customer}.pdf`}>
+        <button className="px-5 py-3 mx-2.5 bg-blue-500 text-white border-0 rounded cursor-pointer shadow transition-colors duration-300 ease-in-out hover:bg-blue-600">
+          Download
+        </button>
+      </PDFDownloadLink>
+    </div>
   );
 };
 
 /**
- * Build document for PDF
+ * PDF Document for the monthly report
  * @param {*} data 
  * @returns 
  */
 const MyDocument = ({data}) => {
   data = data.data;
-  const qrCode = RetrieveQrCode(data.serviceFee);
-  console.log(data);
   try{
   return(
   <Document>
@@ -166,9 +236,9 @@ const MyDocument = ({data}) => {
           <Text style={styles.sectionTitle}>Movimentações</Text>
           {data.operations.map((operation, index) => (
               <View style={[styles.row, operation.type === 'Aporte' ? styles.movimentacoesPositive : styles.movimentacoesNegative]} key={index}>
-                <Text>{operation.fund}</Text>
-                <Text>{operation.date}</Text>
-                <Text>{ConvertToCurrency(operation.value)}</Text>
+                <Text style={[styles.operationsText, {textAlign:'left'}]}>{operation.fund}</Text>
+                <Text style={[styles.operationsText,{textAlign: 'center'}]}>{operation.date}</Text>
+                <Text style={[styles.operationsText,{textAlign: 'right'}]}>{ConvertToCurrency(operation.value)}</Text>
               </View>
           ))}
           <View style={[styles.row, styles.total]}><Text>Total:</Text><Text>{ConvertToCurrency(data.totalOperations)}</Text></View>
@@ -202,10 +272,11 @@ const MyDocument = ({data}) => {
             <Text style={styles.resumoTitle}>Taxa de Consultoria</Text>
             <Text style={styles.resumoValue}>{ConvertToCurrency(data.serviceFee)}</Text>
           </View>
-        </View>
-          <View>
-            {qrCode && <Image src={qrCode} style={{ width: 100, margin: '0 auto' }}/>}
+          <View style={styles.paymentBox}>
+            <Text style={[styles.textWrap, {fontSize:'14'}]}>Este Pagamento pode ser realizado através deste QRCode(PIX):</Text>
+            {data.qrCode && <Image src={data.qrCode} style={{ width: 100}}/>}
           </View>
+        </View>
       </View>
     </Page>
   </Document>

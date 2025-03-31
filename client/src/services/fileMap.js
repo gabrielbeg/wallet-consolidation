@@ -1,4 +1,3 @@
-'use client'
 /**
  * Maps data from an Excel file into a structured format
  * 
@@ -10,7 +9,6 @@
  *                           with the customer name and potentially other mapped properties
  */
 const MapExcelData = (data) => {
-    console.log(data);
     let sheets = data.SheetNames.slice(1, data.SheetNames.length); // Remove first sheet since it's not a customer sheet
     let mappedData = [];    
 
@@ -41,7 +39,6 @@ const MapExcelData = (data) => {
 
         // Fund End Values
         let fundEndValues = cells.filter(cell => cell.includes("J") && Number(cell[1]) > 2).map(cell => currentSheet[cell]);
-        console.log(fundEndValues);
         funds = fundNames.map((name, index) => {
             return {
                 name: name.v,
@@ -78,4 +75,4 @@ const FormatDate = (date) => {
     return new Date(`${parts[2]}-${parts[1]}-${parts[0]}`);
 }
 
-module.exports = MapExcelData;
+export default MapExcelData;

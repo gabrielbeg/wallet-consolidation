@@ -1,21 +1,15 @@
-import { buildPixPayload } from './services/pix.js';
-import QRCode from './services/qrCode.js';
+import { BuildPix } from './services/qrCode.js';
 
-const BuildPix = (price) => {
-  const payload = buildPixPayload({
-    pixKey: process.env.PIX_KEY,
-    name: process.env.PIX_NAME,
-    city: process.env.PIX_CITY,
-    value: price,
-    message: process.env.PIX_MESSAGE // Max of 15 characters
-  })
-  
-  return QRCode(payload);
-}
-
+/**
+ * Default handler function for lambda calls
+ * @param {*} event 
+ * @returns 
+ */
 export const handler = async (event) => {
   try {
-    const { price } = JSON.parse(event.body);
+    console.log(event?.body)
+    const jsonBody = JSON.parse(event?.body);
+    const price = jsonBody?.price ?? 0;
 
     if (!price || isNaN(price)) {
       return {
@@ -24,13 +18,18 @@ export const handler = async (event) => {
       };
     }
 
-    const qrCode = BuildPix(price);
-
-    return {
+    const qrCode = await BuildPix(price);
+    const response = {
       statusCode: 200,
       body: JSON.stringify({ qrCode }),
     };
+    console.log(`Response: ${JSON.stringify(response)}`);
+    return {
+      statusCode: 200,
+      body: response,
+    };
   } catch (error) {
+    console.error(error);
     return {
       statusCode: 500,
       body: JSON.stringify({ error: 'Internal Server Error', details: error.message }),

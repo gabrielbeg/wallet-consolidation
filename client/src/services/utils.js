@@ -1,3 +1,4 @@
+'use client'
 /**
  * Validate and format a number to Brazilian currency format
  * • nullable values are converted to zero

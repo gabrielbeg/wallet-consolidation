@@ -10,7 +10,11 @@
         "netTotal": "Total Profit Percentage",
         "averageCapital": "Average Capital",
         "approximateProfit": "Approximate Profit",
-        "cdi" : "CDI"
+        "serviceFee": "Service Fee",
+        "cdi" : "CDI",
+        "dateStart": "Start Date",
+        "dateEnd": "End Date",
+        "actions": "Actions"
     },
     "pt": {
         "title": "Consolidação de Carteira",
@@ -23,6 +27,10 @@
         "netTotal": "Total de Lucro",
         "averageCapital": "Capital Médio",
         "approximateProfit": "Lucro Aproximado",
-        "cdi" : "CDI"
+        "serviceFee": "Taxa de Serviço",
+        "cdi" : "CDI",
+        "dateStart": "Data Inicial",
+        "dateEnd": "Data Final",
+        "actions": "Ações"
     }
 }

@@ -13,20 +13,32 @@ export default function Home() {
   const [texts, setTexts] = useState(languages[lang]);
 
   /**
-   * When a file is selected, read the file and map the data
+   * When a file is selected, read the file and map the data - NOT tested with multiple files yet(it is possi)
    * @param {event} e 
    */
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     const reader = new FileReader();
+    reader.readAsArrayBuffer(file);
     reader.onload = (event) => {
       const data = new Uint8Array(event.target.result);
       const workbook = XLSX.read(data, { type: "array" });
       const mappedData = MapExcelData(workbook);
       setTableData(mappedData);
     };
-    reader.readAsArrayBuffer(file);
+    e.target.value = ''; // Clear the file input value after reading the file so it can be reused and reprocessed.
+
   };
+
+  useEffect(() => {
+    // Set the initial language based on the browser's language
+    const browserLang = navigator.language.split("-")[0];
+    if (languages[browserLang]) {
+      setLang(browserLang);
+    } else {
+      setLang("pt");
+    }
+  }, [tableData]);
 
   /**
    * Select a language to set the texts
@@ -90,11 +102,12 @@ export default function Home() {
         <table className="w-full text-sm text-center text-gray-500 dark:text-gray-400">
         <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
         <tr>
-          <th key='customer' className="px-6 py-3">Customer</th>
-          <th key='dateStart' className="px-6 py-3">Date Start</th>
-          <th key='dateEnd' className="px-6 py-3">Date End</th>
-          <th key='profit' className="px-6 py-3">Approximate Profit</th>
-          <th key='fee' className="px-6 py-3">Service Fee</th>
+          <th key='customer' className="px-6 py-3">{texts.customer}</th>
+          <th key='dateStart' className="px-6 py-3">{texts.dateStart}</th>
+          <th key='dateEnd' className="px-6 py-3">{texts.dateEnd}</th>
+          <th key='profit' className="px-6 py-3">{texts.approximateProfit}</th>
+          <th key='fee' className="px-6 py-3">{texts.serviceFee}</th>
+          <th key='actions' className="px-6 py-3">{texts.actions}</th>
         </tr>
         </thead>
         <tbody>
@@ -105,21 +118,15 @@ export default function Home() {
           <td className="text-center">{item.dateEnd}</td>
           <td className="text-center">{(item.approximateProfit * 100).toFixed(2)}%</td>
           <td className="text-center">{ConvertToCurrency(item.serviceFee)}</td>
+          <td className="text-center">
+            <MonthlyReport key={`pdf-${index}`} data={item} />
+          </td>
         </tr>
         ))}
         </tbody>
         </table>
         </div>
         )}
-        {/* PDFViewer */}
-        {tableData.length > 0 && (
-          <div className="flex flex-col items-center justify-center mb-8 w-full">
-            {tableData.map((item, index) => (
-              <MonthlyReport key={`pdf-${index}`} data={item}/>
-            ))}
-          </div>
-        )}
-        {/* Footer */}
       </main>          
     </div>
   );
