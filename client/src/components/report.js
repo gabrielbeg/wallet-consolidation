@@ -102,7 +102,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   paymentBox:{
-    width: '60%',
     borderRadius: 4,
     backgroundColor: '#E5E5E5',
     padding: 5,
@@ -117,14 +116,6 @@ const styles = StyleSheet.create({
   resumoValue: {
     fontSize: 14,
     fontWeight: 'bold'
-  },
-  textWrap: {
-    display: "flex",
-    flexWrap: "wrap",
-    flexGrow: 1,
-    flexBasis: 0,
-    padding: 2,
-    leftMargin: 5,
   },
   operationsText: {
     width: '30%'
@@ -273,7 +264,6 @@ const MyDocument = ({data}) => {
             <Text style={styles.resumoValue}>{ConvertToCurrency(data.serviceFee)}</Text>
           </View>
           <View style={styles.paymentBox}>
-            <Text style={[styles.textWrap, {fontSize:'14'}]}>Este Pagamento pode ser realizado através deste QRCode(PIX):</Text>
             {data.qrCode && <Image src={data.qrCode} style={{ width: 100}}/>}
           </View>
         </View>

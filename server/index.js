@@ -7,7 +7,6 @@ import { BuildPix } from './services/qrCode.js';
  */
 export const handler = async (event) => {
   try {
-    console.log(event?.body)
     const jsonBody = JSON.parse(event?.body);
     const price = jsonBody?.price ?? 0;
 

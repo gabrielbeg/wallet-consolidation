@@ -23,12 +23,12 @@ const MapExcelData = (data) => {
         const dateEnd = currentSheet["A4"].w;
         let funds = [];
         // Fund Names
-        let fundNames = cells.filter(cell => cell.includes("B") && Number(cell[1]) > 2).map(cell => currentSheet[cell]);
+        let fundNames = cells.filter(cell => cell.includes("B") && RetrieveCellNumber(cell) > 2).map(cell => currentSheet[cell]);
         // Fund Values
-        let fundStartValues = cells.filter(cell => cell.includes("C") && Number(cell[1]) > 2).map(cell => currentSheet[cell]);
+        let fundStartValues = cells.filter(cell => cell.includes("C") && RetrieveCellNumber(cell) > 2).map(cell => currentSheet[cell]);
         
         // Addition or subtraction of funds (Filter by H and greater than 2)
-        let fundOperations = cells.filter(cell => cell.includes("H") && Number(cell[1]) > 2).map(cell => { 
+        let fundOperations = cells.filter(cell => cell.includes("H") && RetrieveCellNumber(cell) > 2).map(cell => { 
             return ({
                 fund: currentSheet[cell].v,
                 date: currentSheet[`E${cell[1]}`].w,
@@ -38,7 +38,7 @@ const MapExcelData = (data) => {
         });       
 
         // Fund End Values
-        let fundEndValues = cells.filter(cell => cell.includes("J") && Number(cell[1]) > 2).map(cell => currentSheet[cell]);
+        let fundEndValues = cells.filter(cell => cell.includes("J") && RetrieveCellNumber(cell) > 2).map(cell => currentSheet[cell]);
         funds = fundNames.map((name, index) => {
             return {
                 name: name.v,
@@ -66,7 +66,6 @@ const MapExcelData = (data) => {
 
 /**
  * Convert received date dd/mm/yyyy to yyyy-mm-dd
- * 
  * @param date - The date in the format dd/mm/yyyy
  * @returns - The date in the Date format
  */
@@ -74,5 +73,16 @@ const FormatDate = (date) => {
     const parts = date.split("/");
     return new Date(`${parts[2]}-${parts[1]}-${parts[0]}`);
 }
+
+/**
+ * This functions retrieves the cell number from the cell string and converts into a number ignoring the cell letter.
+ * @param {string} cell - The Excel cell reference
+ * @example RetrieveCellNumber("B10") returns 10
+ * @returns {number} - The cell number as a number
+ */
+const RetrieveCellNumber = (cell) => {
+    const cellNumber = cell.substring(1, cell.length);
+    return Number(cellNumber);
+};
 
 export default MapExcelData;
