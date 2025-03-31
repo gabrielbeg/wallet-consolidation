@@ -1,4 +1,5 @@
 import QRCode from 'qrcode';
+import { buildPixPayload } from './pix.js';
 
 /**
  * Generate a Pix QRCode with the given payload. Used Promise return to avoid cascading async await without the need.
