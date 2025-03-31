@@ -257,7 +257,7 @@ const MyDocument = ({data}) => {
           </View>
           <View style={styles.resumoBox}>
             <Text style={styles.resumoTitle}>CDI no período</Text>
-            <Text style={styles.resumoValue}>{ConvertToCurrency(data.cdi)}%</Text>
+            <Text style={styles.resumoValue}>{data.cdi}%</Text>
           </View>
           <View style={styles.resumoBox}>
             <Text style={styles.resumoTitle}>Taxa de Consultoria</Text>
