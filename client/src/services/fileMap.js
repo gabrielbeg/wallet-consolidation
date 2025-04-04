@@ -10,7 +10,7 @@
  */
 const MapExcelData = (data) => {
     let sheets = data.SheetNames.slice(1, data.SheetNames.length); // Remove first sheet since it's not a customer sheet
-    let mappedData = [];    
+    let mappedData = [];
 
     for(let sheet of sheets){
         const mappedItem = {};
