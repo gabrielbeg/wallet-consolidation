@@ -12,9 +12,9 @@ import { Document, Page, View, Image, Text, StyleSheet } from '@react-pdf/render
 import { ConvertToCurrency } from "@/services/utils";
 import RetrieveQrCode from "@/api/qrCodeGenerator";
 
-  /**
- * * Styles for the PDF document
- */
+/**
+* * Styles for the PDF document
+*/
 const styles = StyleSheet.create({
   page: {
     backgroundColor: '#2D0E0E',
@@ -101,7 +101,7 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     justifyContent: 'center',
   },
-  paymentBox:{
+  paymentBox: {
     borderRadius: 4,
     backgroundColor: '#E5E5E5',
     padding: 5,
@@ -121,29 +121,27 @@ const styles = StyleSheet.create({
     width: '30%'
   }
 });
-  
+
 /**
  * Deals with the monthly report generation and download
  * It awaits for the QRCode to be generated and then displays the download button accordingly
  * @param {*} data 
  * @returns 
  */
-function MonthlyReport(data){
-  const[qrCode, setQrCode] = React.useState(null);
+function MonthlyReport(data) {
+  const [qrCode, setQrCode] = React.useState(null);
   const [error, setError] = React.useState(null);
   const [loading, setLoading] = React.useState(true);
 
   useEffect(() => {
     setLoading(true);
-    RetrieveQrCode(data.data.serviceFee).then((response) =>
-    {
-      if(response.statusCode === 200) {
+    RetrieveQrCode(data.data.serviceFee).then((response) => {
+      if (response.statusCode === 200) {
         response = JSON.parse(response.body);
         setQrCode(response.qrCode);
         setLoading(false);
       }
-      else
-      {
+      else {
         setError(new Error('QR Code não gerado'));
         setLoading(false);
       }
@@ -154,26 +152,26 @@ function MonthlyReport(data){
     })
   }, [qrCode]);
 
-  if(error) {
+  if (error) {
     return <p style={styles.error}>Erro ao gerar QR Code: {error.message}</p>;
   }
-  if(loading) {
-    return(
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
-      <div style={{ 
-      width: '40px', 
-      height: '40px', 
-      border: '4px solid rgba(0, 0, 0, 0.1)', 
-      borderTopColor: '#007BFF', 
-      borderRadius: '50%', 
-      animation: 'spin 1s linear infinite' 
-      }}></div>
-      <style jsx>{`
+  if (loading) {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
+        <div style={{
+          width: '40px',
+          height: '40px',
+          border: '4px solid rgba(0, 0, 0, 0.1)',
+          borderTopColor: '#007BFF',
+          borderRadius: '50%',
+          animation: 'spin 1s linear infinite'
+        }}></div>
+        <style jsx>{`
       @keyframes spin {
         to {transform: rotate(360deg);}
       }
       `}</style>
-    </div>);
+      </div>);
   }
 
   const newData = {
@@ -185,7 +183,7 @@ function MonthlyReport(data){
 
   return (
     <div className="flex flex-col items-center justify-center w-full my-5">
-      <PDFDownloadLink document={<MyDocument data={newData}/>} fileName={`${data.data.customer}.pdf`}>
+      <PDFDownloadLink document={<MyDocument data={newData} />} fileName={`${data.data.customer}.pdf`}>
         <button className="px-5 py-3 mx-2.5 bg-blue-500 text-white border-0 rounded cursor-pointer shadow transition-colors duration-300 ease-in-out hover:bg-blue-600">
           Download
         </button>
@@ -199,93 +197,136 @@ function MonthlyReport(data){
  * @param {*} data 
  * @returns 
  */
-const MyDocument = ({data}) => {
+const MyDocument = ({ data }) => {
   data = data.data;
-  try{
-  return(
-  <Document>
-    <Page size="A4" style={styles.page} wrap={false}>
-      <Image src="/logo.png" style={styles.logo}/>
-      <View style={styles.container}>
-        <View style={styles.header}>
-          <Text style={styles.title}>{data.customer}</Text>
-          <Text style={styles.subtitle}>Relatório mensal ({data.dateStart} - {data.dateEnd})</Text>
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Carteira - {data.dateStart}</Text>
-          {data.funds.map((fund, index) => (
-            <View style={styles.row} key={index}>
-              <Text>{fund.name}</Text>
-              <Text>{ConvertToCurrency(fund.startValue)}</Text>
+  try {
+    return (
+      <Document>
+        <Page size="A4" style={styles.page} wrap={false}>
+          <Image src="/logo.png" style={styles.logo} />
+          <View style={styles.container}>
+            <View style={styles.header}>
+              <Text style={styles.title}>{data.customer}</Text>
+              <Text style={styles.subtitle}>Relatório mensal ({data.dateStart} - {data.dateEnd})</Text>
             </View>
-            ))}
-          <View style={[styles.row, styles.total]}><Text>Total:</Text><Text>{ConvertToCurrency(data.startValue)}</Text></View>
-        </View>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Movimentações</Text>
-          {data.operations.map((operation, index) => (
-              <View style={[styles.row, operation.type === 'Aporte' ? styles.movimentacoesPositive : styles.movimentacoesNegative]} key={index}>
-                <Text style={[styles.operationsText, {textAlign:'left'}]}>{operation.fund}</Text>
-                <Text style={[styles.operationsText,{textAlign: 'center'}]}>{operation.date}</Text>
-                <Text style={[styles.operationsText,{textAlign: 'right'}]}>{ConvertToCurrency(operation.value)}</Text>
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Carteira - {data.dateStart}</Text>
+              {data.funds.map((fund, index) => (
+                <View style={styles.row} key={index}>
+                  <Text>{fund.name}</Text>
+                  <Text>{ConvertToCurrency(fund.startValue)}</Text>
+                </View>
+              ))}
+              <View style={[styles.row, styles.total]}><Text>Total:</Text><Text>{ConvertToCurrency(data.startValue)}</Text></View>
+            </View>
+
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Movimentações</Text>
+              {data.operations.map((operation, index) => (
+                <View style={[styles.row, operation.type === 'Aporte' ? styles.movimentacoesPositive : styles.movimentacoesNegative]} key={index}>
+                  <Text style={[styles.operationsText, { textAlign: 'left' }]}>{operation.fund}</Text>
+                  <Text style={[styles.operationsText, { textAlign: 'center' }]}>{operation.date}</Text>
+                  <Text style={[styles.operationsText, { textAlign: 'right' }]}>{ConvertToCurrency(operation.value)}</Text>
+                </View>
+              ))}
+              <View style={[styles.row, styles.total]}><Text>Total:</Text><Text>{ConvertToCurrency(data.totalOperations)}</Text></View>
+            </View>
+
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Carteira - {data.dateEnd}</Text>
+              {data.funds.map((fund, index) => (
+                <View style={styles.row} key={index}>
+                  <Text>{fund.name}</Text>
+                  <Text>{ConvertToCurrency(fund.endValue)}</Text>
+                </View>
+              ))}
+              <View style={[styles.row, styles.total]}><Text>Total:</Text><Text>{ConvertToCurrency(data.endValue)}</Text></View>
+            </View>
+
+            {/* Divider */}
+            <View style={{ width: '100%', marginTop: '20px' }}>
+              <Text style={[styles.resumoTitle, { color: 'white' }]}>Dados Brutos - Desconsiderando Taxa de Consultoria</Text>
+              <View style={{ width: '100%', height: 1, backgroundColor: '#CCC', marginBottom: 10 }} />
+            </View>
+            <View style={styles.resumo}>
+              <View style={styles.resumoBox}>
+                <Text style={styles.resumoTitle}>Resultado Financeiro</Text>
+                <Text style={styles.resumoValue}>{ConvertToCurrency(data.netTotal)}</Text>
               </View>
-          ))}
-          <View style={[styles.row, styles.total]}><Text>Total:</Text><Text>{ConvertToCurrency(data.totalOperations)}</Text></View>
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Carteira - {data.dateEnd}</Text>
-          {data.funds.map((fund, index) => (
-            <View style={styles.row} key={index}>
-              <Text>{fund.name}</Text>
-              <Text>{ConvertToCurrency(fund.endValue)}</Text>
+              <View style={styles.resumoBox}>
+                <Text style={styles.resumoTitle}>Resultado Percentual</Text>
+                <Text style={styles.resumoValue}>{data.approximateProfit}%</Text>
+              </View>
+              <View style={styles.resumoBox}>
+                <Text style={styles.resumoTitle}>CDI Correspondente</Text>
+                <Text style={styles.resumoValue}>{data.cdiProfit}%</Text>
+              </View>
             </View>
-          ))}
-          <View style={[styles.row, styles.total]}><Text>Total:</Text><Text>{ConvertToCurrency(data.endValue)}</Text></View>
-        </View>
 
-        <View style={styles.resumo}>
-          <View style={styles.resumoBox}>
-            <Text style={styles.resumoTitle}>Resultado Líquido</Text>
-            <Text style={styles.resumoValue}>{ConvertToCurrency(data.netTotal)}</Text>
+            {/* Divider */}
+            <View style={{ width: '100%' }}>
+              <Text style={[styles.resumoTitle, { color: 'white' }]}>Dados Líquidos - Considerando Taxa de Consultoria</Text>
+              <View style={{ width: '100%', height: 1, backgroundColor: '#CCC', marginBottom: 10 }} />
+            </View>
+
+            <View style={styles.resumo}>
+              <View style={styles.resumoBox}>
+                <Text style={styles.resumoTitle}>Resultado Financeiro</Text>
+                <Text style={styles.resumoValue}>{ConvertToCurrency(data.netMinusFee)}</Text>
+              </View>
+              <View style={styles.resumoBox}>
+                <Text style={styles.resumoTitle}>Resultado Percentual</Text>
+                <Text style={styles.resumoValue}>{data.profitabilityMinusFee}%</Text>
+              </View>
+              <View style={styles.resumoBox}>
+                <Text style={styles.resumoTitle}>CDI Correspondente</Text>
+                <Text style={styles.resumoValue}>{data.cdiPercentage}%</Text>
+              </View>
+            </View>
+
+            {/* Divider */}
+            <View style={{ width: '100%', height: 1, backgroundColor: '#CCC', marginBottom: 10 }} />
+
+            <View style={[styles.resumo, { alignItems: 'center'}]}>
+              <View style={styles.resumoBox}>
+                <Text style={styles.resumoTitle}>Taxa de Consultoria</Text>
+                <Text style={styles.resumoValue}>{ConvertToCurrency(data.serviceFee)}</Text>
+              </View>
+              <View style={styles.resumoBox}>
+                <Text style={styles.resumoTitle}>CDI no período</Text>
+                <Text style={styles.resumoValue}>{data.cdi}%</Text>
+              </View>
+              <View style={styles.paymentBox}>
+                <View style={{ flexDirection: 'column', alignItems: 'center' }}>
+                  {data.qrCode && <Image src={data.qrCode} style={{ width: 100, marginBottom: 5 }} />}
+                  <Text>CNPJ: 57.866.610/0001-90</Text>
+                </View>
+              </View>
+            </View>
+            
+            <Text style={[styles.resumoTitle, { color: 'white', overflowWrap: 'normal', textJustify: 'distribute', width: '100%', marginTop: '10px'}]}>
+            A fim de manter os parâmetros para eventuais comparativos entre Bancos e Corretoras, os valores estão apresentados brutos e também sem a taxa de consultoria. Para valores líquidos de IR e IOF, segue relatório complementar emitido pela corretora.
+            </Text>
+          
           </View>
-          <View style={styles.resumoBox}>
-            <Text style={styles.resumoTitle}>Rentabilidade</Text>
-            <Text style={styles.resumoValue}>{(data.approximateProfit*100).toFixed(2)}%</Text>
+        </Page>
+      </Document>
+    )
+  }
+  catch (ex) {
+    console.error(ex);
+    return (
+      <Document>
+        <Page size="A4" style={styles.page}>
+          <View style={styles.container}>
+            <Text style={styles.title}>Erro ao gerar relatório</Text>
+            <Text style={styles.subtitle}>Verifique se o arquivo está correto e tente novamente.</Text>
           </View>
-          <View style={styles.resumoBox}>
-            <Text style={styles.resumoTitle}>CDI no período</Text>
-            <Text style={styles.resumoValue}>{data.cdi}%</Text>
-          </View>
-          <View style={styles.resumoBox}>
-            <Text style={styles.resumoTitle}>Taxa de Consultoria</Text>
-            <Text style={styles.resumoValue}>{ConvertToCurrency(data.serviceFee)}</Text>
-          </View>
-          <View style={styles.paymentBox}>
-            {data.qrCode && <Image src={data.qrCode} style={{ width: 100}}/>}
-          </View>
-        </View>
-      </View>
-    </Page>
-  </Document>
-  )
-}
-catch(ex)
-{
-  console.error(ex);
-  return(
-    <Document>
-      <Page size="A4" style={styles.page}>
-        <View style={styles.container}>
-          <Text style={styles.title}>Erro ao gerar relatório</Text>
-          <Text style={styles.subtitle}>Verifique se o arquivo está correto e tente novamente.</Text>
-        </View>
-      </Page>
-    </Document>
-  )
-}
+        </Page>
+      </Document>
+    )
+  }
 };
 
 export default MonthlyReport;
