@@ -29,11 +29,12 @@ const MapExcelData = (data) => {
         
         // Addition or subtraction of funds (Filter by H and greater than 2)
         let fundOperations = cells.filter(cell => cell.includes("H") && RetrieveCellNumber(cell) > 2).map(cell => { 
+            const rowNumber = RetrieveCellNumber(cell);
             return ({
                 fund: currentSheet[cell].v,
-                date: currentSheet[`E${cell[1]}`].w,
-                type: currentSheet[`F${cell[1]}`].v,
-                value: currentSheet[`G${cell[1]}`].v
+                date: currentSheet[`E${rowNumber}`].w,
+                type: currentSheet[`F${rowNumber}`].v,
+                value: currentSheet[`G${rowNumber}`].v
             })
         });       
 
