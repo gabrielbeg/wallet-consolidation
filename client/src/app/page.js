@@ -116,7 +116,7 @@ export default function Home() {
           <td className="ml-2">{item.customer}</td>
           <td className="text-center">{item.dateStart}</td>
           <td className="text-center">{item.dateEnd}</td>
-          <td className="text-center">{(item.approximateProfit * 100).toFixed(2)}%</td>
+          <td className="text-center">{(Number(item.approximateProfit).toFixed(2))}%</td>
           <td className="text-center">{ConvertToCurrency(item.serviceFee)}</td>
           <td className="text-center">
             <MonthlyReport key={`pdf-${index}`} data={item} />
