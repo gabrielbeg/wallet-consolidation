@@ -224,7 +224,7 @@ const MyDocument = ({ data }) => {
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Movimentações</Text>
               {data.operations.map((operation, index) => (
-                <View style={[styles.row, operation.type === 'Aporte' ? styles.movimentacoesPositive : styles.movimentacoesNegative]} key={index}>
+                <View style={styles.row} key={index}>
                   <Text style={[styles.operationsText, { textAlign: 'left' }]}>{operation.fund}</Text>
                   <Text style={[styles.operationsText, { textAlign: 'center' }]}>{operation.date}</Text>
                   <Text style={[styles.operationsText, { textAlign: 'right' }]}>{ConvertToCurrency(operation.value)}</Text>
