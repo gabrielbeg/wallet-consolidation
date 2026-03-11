@@ -12,7 +12,7 @@ My wife is an investment consultant that always have to work with multiple inves
 One day we decided to go through all the numbers because if felt that those numbers were off... And in fact they were... I mean, most broker platforms were using a method that was not showing the reality of an investor wallet. That was bad, broker platforms were just showing unreal profitability and assets scenarios to its customers, the real problem here is that Investment Consultants has to charge customers based on their Assets value. If those values were wrong, customers were not being properly charged.
 
 ### The Solution
-We decided to do a research, study and find a formula that was a better one for the customers. This formula should take into account the Contributions and the withdraw the money from the wallet and show realistic numbers at the end. So she would insert all the customers investiments and operations during the period into an excel formula that would generate 
+We decided to do a research, study and find a formula that was a better one for the customers. This formula should take into account the Contributions and the withdraw the money from the wallet and show realistic numbers at the end. So she would insert all the customers investments and operations during the period into an excel formula that would generate 
 
 #### WAHP: Weighted Average Holding Period
 This method of calculating a wallet profitability would take into account the exposure time of each individual investment like trust funds, stocks and etc during a specifc period. This would bring reality to customers, increasing her service quality and bringing confidence to customers.
