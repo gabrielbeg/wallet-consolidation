@@ -263,10 +263,11 @@ const MyDocument = ({ data }) => {
                 <Text style={styles.resumoValue}>{data.cdi}%</Text>
               </View>
             </View>
-
+            {/* Remover CNPJ
             <Text style={[styles.disclaimer, { marginTop: 0, marginBottom: 10 }]}>
               CNPJ: 57.866.610/0001-90
             </Text>
+            */}
             
             <Text style={styles.disclaimer}>
             A fim de manter os parâmetros para eventuais comparativos entre Bancos e Corretoras, os valores estão apresentados brutos e também sem a taxa de consultoria. Para valores líquidos de IR e IOF, segue relatório complementar emitido pela corretora.
