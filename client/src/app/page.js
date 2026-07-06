@@ -74,7 +74,7 @@ export default function Home() {
           <Image
             className="mb-6"
             src="/logo.png"
-            alt="Next.js logo"
+            alt="Gade Investimentos"
             width={180}
             height={38}
             priority

@@ -57,7 +57,7 @@ const MapExcelData = (data) => {
             mappedItem.netTotal = currentSheet["M4"].v;
             mappedItem.averageCapital = currentSheet["M5"].v;
             mappedItem.approximateProfit = (currentSheet["M6"]?.v * 100).toFixed(2) ?? 0;
-            mappedItem.cdi = currentSheet["M7"]?.v ?? 0;
+            mappedItem.cdi = (currentSheet["M7"]?.v * 100).toFixed(2) ?? 0;
             mappedItem.funds = funds;
             mappedItem.serviceFee = currentSheet["N2"].v;
             mappedItem.dateStart = dateStart;

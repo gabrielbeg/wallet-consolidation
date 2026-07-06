@@ -7,23 +7,27 @@ const PDFDownloadLink = dynamic(
   {
     ssr: false
   });
-import React, { useEffect } from "react";
+import React from "react";
 import { Document, Page, View, Image, Text, StyleSheet } from '@react-pdf/renderer';
 import { ConvertToCurrency } from "@/services/utils";
-import RetrieveQrCode from "@/api/qrCodeGenerator";
+
+const GADE_NAVY = '#00263e';
+const GADE_GOLD = '#C8C3AF';
+const GADE_GOLD_DARK = '#968F75';
+const GADE_PANEL = '#F5F4F0';
 
 /**
 * * Styles for the PDF document
 */
 const styles = StyleSheet.create({
   page: {
-    backgroundColor: '#2D0E0E',
+    backgroundColor: GADE_NAVY,
     padding: 30,
     fontSize: 10,
     fontFamily: 'Helvetica'
   },
   logo: {
-    width: 100,
+    width: 60,
     position: 'absolute',
     top: 20,
     left: 20,
@@ -37,7 +41,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   title: {
-    color: '#FFF',
+    color: GADE_GOLD,
     fontSize: 20,
     fontWeight: 'bold',
     textAlign: 'right',
@@ -51,26 +55,25 @@ const styles = StyleSheet.create({
   section: {
     marginTop: 15,
     padding: 10,
-    backgroundColor: '#D9D9D9',
+    backgroundColor: GADE_PANEL,
     borderRadius: 6,
-    border: '1px solid #FFF',
-    opacity: 0.85,
+    border: `1px solid ${GADE_GOLD}`,
   },
   sectionTitle: {
     textAlign: 'center',
     fontSize: 11,
     fontWeight: 'bold',
     marginBottom: 6,
+    color: GADE_NAVY,
   },
   row: {
-    backgroundColor: '#D9D9D9',
+    backgroundColor: GADE_PANEL,
     borderRadius: 4,
     padding: 4,
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: 4,
-    border: '1px solid #FFF',
-    opacity: 0.85,
+    border: `1px solid ${GADE_GOLD_DARK}`,
   },
   total: {
     paddingTop: 4,
@@ -92,98 +95,65 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   resumoBox: {
-    width: '30%',
+    width: '48%',
     height: '60px',
-    backgroundColor: '#E5E5E5',
+    backgroundColor: GADE_PANEL,
     borderRadius: 4,
     marginBottom: 20,
     textAlign: 'center',
     flexDirection: 'column',
     justifyContent: 'center',
-  },
-  paymentBox: {
-    borderRadius: 4,
-    backgroundColor: '#E5E5E5',
-    padding: 5,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
+    border: `1px solid ${GADE_GOLD}`,
   },
   resumoTitle: {
     fontSize: 12,
     marginBottom: 2,
+    color: GADE_NAVY,
   },
   resumoValue: {
     fontSize: 14,
-    fontWeight: 'bold'
+    fontWeight: 'bold',
+    color: GADE_NAVY,
   },
   operationsText: {
     width: '30%'
-  }
+  },
+  divider: {
+    width: '100%',
+    height: 1,
+    backgroundColor: GADE_GOLD,
+    marginBottom: 10,
+  },
+  sectionHeading: {
+    color: GADE_GOLD,
+    fontSize: 12,
+    marginBottom: 2,
+  },
+  disclaimer: {
+    color: '#FFF',
+    overflowWrap: 'normal',
+    textJustify: 'distribute',
+    width: '100%',
+    marginTop: '10px',
+    fontSize: 9,
+  },
 });
 
 /**
  * Deals with the monthly report generation and download
- * It awaits for the QRCode to be generated and then displays the download button accordingly
  * @param {*} data 
  * @returns 
  */
 function MonthlyReport(data) {
-  const [qrCode, setQrCode] = React.useState(null);
-  const [error, setError] = React.useState(null);
-  const [loading, setLoading] = React.useState(true);
-
-  useEffect(() => {
-    setLoading(true);
-    RetrieveQrCode(data.data.serviceFee).then((response) => {
-      if (response.statusCode === 200) {
-        response = JSON.parse(response.body);
-        setQrCode(response.qrCode);
-        setLoading(false);
-      }
-      else {
-        setError(new Error('QR Code não gerado'));
-        setLoading(false);
-      }
-    }).catch((error) => {
-      console.error(error);
-      setError(error);
-      setLoading(false);
-    })
-  }, [qrCode]);
-
-  if (error) {
-    return <p style={styles.error}>Erro ao gerar QR Code: {error.message}</p>;
-  }
-  if (loading) {
-    return (
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
-        <div style={{
-          width: '40px',
-          height: '40px',
-          border: '4px solid rgba(0, 0, 0, 0.1)',
-          borderTopColor: '#007BFF',
-          borderRadius: '50%',
-          animation: 'spin 1s linear infinite'
-        }}></div>
-        <style jsx>{`
-      @keyframes spin {
-        to {transform: rotate(360deg);}
-      }
-      `}</style>
-      </div>);
-  }
-
-  const newData = {
+  const gadeData = {
     data: {
-      ...data.data,
-      qrCode: qrCode
+      ...data.data
     }
   }
 
   return (
     <div className="flex flex-col items-center justify-center w-full my-5">
-      <PDFDownloadLink document={<MyDocument data={newData} />} fileName={`${data.data.customer}.pdf`}>
+      <PDFDownloadLink document={<MyDocument data={gadeData} />} fileName={`${data.data.customer}.pdf`}>
         <button className="px-5 py-3 mx-2.5 bg-blue-500 text-white border-0 rounded cursor-pointer shadow transition-colors duration-300 ease-in-out hover:bg-blue-600">
           Download
         </button>
@@ -203,7 +173,7 @@ const MyDocument = ({ data }) => {
     return (
       <Document>
         <Page size="A4" style={styles.page} wrap={false}>
-          <Image src="/logo.png" style={styles.logo} />
+          <Image src="/gade-logo.png" style={styles.logo} />
           <View style={styles.container}>
             <View style={styles.header}>
               <Text style={styles.title}>{data.customer}</Text>
@@ -244,10 +214,9 @@ const MyDocument = ({ data }) => {
               <View style={[styles.row, styles.total]}><Text>Total:</Text><Text>{ConvertToCurrency(data.endValue)}</Text></View>
             </View>
 
-            {/* Divider */}
             <View style={{ width: '100%', marginTop: '20px' }}>
-              <Text style={[styles.resumoTitle, { color: 'white' }]}>Dados Brutos - Desconsiderando Taxa de Consultoria</Text>
-              <View style={{ width: '100%', height: 1, backgroundColor: '#CCC', marginBottom: 10 }} />
+              <Text style={styles.sectionHeading}>Dados Brutos</Text>
+              <View style={styles.divider} />
             </View>
             <View style={styles.resumo}>
               <View style={styles.resumoBox}>
@@ -258,16 +227,15 @@ const MyDocument = ({ data }) => {
                 <Text style={styles.resumoTitle}>Resultado Percentual</Text>
                 <Text style={styles.resumoValue}>{data.approximateProfit}%</Text>
               </View>
-              <View style={styles.resumoBox}>
+              {/* <View style={styles.resumoBox}>
                 <Text style={styles.resumoTitle}>CDI Correspondente</Text>
                 <Text style={styles.resumoValue}>{data.cdiProfit}%</Text>
-              </View>
+              </View> */}
             </View>
 
-            {/* Divider */}
-            <View style={{ width: '100%' }}>
-              <Text style={[styles.resumoTitle, { color: 'white' }]}>Dados Líquidos - Considerando Taxa de Consultoria</Text>
-              <View style={{ width: '100%', height: 1, backgroundColor: '#CCC', marginBottom: 10 }} />
+            {/* <View style={{ width: '100%' }}>
+              <Text style={styles.sectionHeading}>Dados Líquidos - Considerando Taxa de Consultoria</Text>
+              <View style={styles.divider} />
             </View>
 
             <View style={styles.resumo}>
@@ -283,10 +251,7 @@ const MyDocument = ({ data }) => {
                 <Text style={styles.resumoTitle}>CDI Correspondente</Text>
                 <Text style={styles.resumoValue}>{data.cdiPercentage}%</Text>
               </View>
-            </View>
-
-            {/* Divider */}
-            <View style={{ width: '100%', height: 1, backgroundColor: '#CCC', marginBottom: 10 }} />
+            </View> */}
 
             <View style={[styles.resumo, { alignItems: 'center'}]}>
               <View style={styles.resumoBox}>
@@ -297,15 +262,13 @@ const MyDocument = ({ data }) => {
                 <Text style={styles.resumoTitle}>CDI no período</Text>
                 <Text style={styles.resumoValue}>{data.cdi}%</Text>
               </View>
-              <View style={styles.paymentBox}>
-                <View style={{ flexDirection: 'column', alignItems: 'center' }}>
-                  {data.qrCode && <Image src={data.qrCode} style={{ width: 100, marginBottom: 5 }} />}
-                  <Text>CNPJ: 57.866.610/0001-90</Text>
-                </View>
-              </View>
             </View>
+
+            <Text style={[styles.disclaimer, { marginTop: 0, marginBottom: 10 }]}>
+              CNPJ: 57.866.610/0001-90
+            </Text>
             
-            <Text style={[styles.resumoTitle, { color: 'white', overflowWrap: 'normal', textJustify: 'distribute', width: '100%', marginTop: '10px'}]}>
+            <Text style={styles.disclaimer}>
             A fim de manter os parâmetros para eventuais comparativos entre Bancos e Corretoras, os valores estão apresentados brutos e também sem a taxa de consultoria. Para valores líquidos de IR e IOF, segue relatório complementar emitido pela corretora.
             </Text>
           
